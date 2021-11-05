@@ -8,9 +8,13 @@ jsn = json.loads(s)
 #########task1#########
 print('Task1:')
 print(len(s))
+
 #########task2#########
 print('Task2:')
-print(len(s.translate(s.maketrans(dict.fromkeys(string.punctuation))).replace(' ', '')))
+temp1 = s.translate(s.maketrans(dict.fromkeys(string.punctuation)))
+temp2 = len(temp1.replace(' ', ''))
+print(temp2)
+
 #########task3#########
 print('Task3:')
 s = ''
@@ -20,6 +24,7 @@ for obj in jsn:
         s = obj['description']
         name = obj['name']
 print(name)
+
 #########task4#########
 print('Task4:')
 words_num = 0
