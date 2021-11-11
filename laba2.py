@@ -3,9 +3,50 @@ import csv
 f = open('anime.csv', encoding='utf-8', newline = '')
 animes = csv.DictReader(f)
 
+#########functions#########
+def check_multiple_params(mult_params, key, anime_list_param, anime_temp_list_param):
+    if mult_params != ['']:
+        rmv = True
+        for anime in anime_temp_list_param:
+            for param in mult_params:
+                anime_params = anime[key].replace(' ', '').split(',')
+                if param in anime_params:
+                    rmv = False
+                    break
+            if rmv:
+                anime_list_param.remove(anime)
+            rmv = True
+def check_one_param(param, key, anime_list_param, anime_temp_list_param):
+    if param != '':
+        for anime in anime_list_temp:
+            if not (anime[key] == param):
+                anime_list_param.remove(anime)
+def check_yes_or_not(param, key, check_param, anime_list_param, anime_temp_list_param):
+    if param != '':
+        if param == 'Y':
+            for anime in anime_temp_list_param:
+                if anime[key] == check_param:
+                    anime_list_param.remove(anime)
+        if param == 'N':
+            for anime in anime_list_temp:
+                if anime[key] != check_param:
+                    anime_list_param.remove(anime)
+def custom_key(anime):
+    try:
+        result = float(anime['Rating Score'])
+        return result
+    except:
+        return 0
+
 #########task1#########
 print('Жанры?')
 janres = input().replace(' ', '').split(',')
+if janres != ['']:
+    for num in range(len(janres)):
+        janres[num] = janres[num].lower()
+        temp_list = list(janres[num])
+        temp_list[0] = temp_list[0].upper()
+        janres[num] = ''.join(temp_list)
 print('Тип? (Че это?)')
 type = input()
 print('Многосерийное аниме? (Y, N)')
@@ -22,68 +63,23 @@ for anime in animes:
     anime_list.append(anime)
 anime_list_temp = anime_list.copy()
 
-if janres != ['']:
-    rmv = True
-    for anime in anime_list_temp:
-        for janre in janres:
-            tags = anime['Tags'].replace(' ', '').split(',')
-            if janre in tags:
-                rmv = False
-                break
-        if rmv:
-            anime_list.remove(anime)
-        rmv = True
+check_multiple_params(janres, 'Tags', anime_list, anime_list_temp)
 anime_list_temp = anime_list.copy()
 
-if type != '':
-    for anime in anime_list_temp:
-        if not (anime['Type'] == type):
-            anime_list.remove(anime)
+check_multiple_params(studios, 'Studios', anime_list, anime_list_temp)
 anime_list_temp = anime_list.copy()
 
-if is_serial != '':
-    if is_serial == 'Y':
-        for anime in anime_list_temp:
-            if anime['Episodes'] == '1':
-                anime_list.remove(anime)
-    if is_serial == 'N':
-        for anime in anime_list_temp:
-            if anime['Episodes'] != '1':
-                anime_list.remove(anime)
+check_one_param(type, 'Type', anime_list, anime_list_temp)
 anime_list_temp = anime_list.copy()
 
-if is_finished != '':
-    if is_finished == 'Y':
-        for anime in anime_list_temp:
-            if anime['Episodes'] == 'False':
-                anime_list.remove(anime)
-    if is_finished == 'N':
-        for anime in anime_list_temp:
-            if anime['Episodes'] == 'True':
-                anime_list.remove(anime)
+check_yes_or_not(is_serial, 'Episodes', '1', anime_list, anime_list_temp)
 anime_list_temp = anime_list.copy()
 
-if studios != ['']:
-    rmv = True
-    for anime in anime_list_temp:
-        for studio in studios:
-            studios_in_anime = anime['Studios'].replace(' ', '').split(',')
-            if studio in studios_in_anime:
-                rmv = False
-                break
-        if rmv:
-            anime_list.remove(anime)
-        rmv = True
+check_yes_or_not(is_finished, 'Finished', 'False', anime_list, anime_list_temp)
 anime_list_temp = anime_list.copy()
 
 f.close()
 
-def custom_key(anime):
-    try:
-        result = float(anime['Rating Score'])
-        return result
-    except:
-        return 0
 anime_list.sort(reverse=True, key=custom_key)
 
 f = open('result.csv', 'w', encoding='utf-8', newline='')
