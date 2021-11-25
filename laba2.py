@@ -22,7 +22,7 @@ def check_multiple_params(mult_params, key,
 
 def check_one_param(param, key, anime_list_param, anime_temp_list_param):
     if param != '':
-        for anime in anime_list_temp:
+        for anime in anime_temp_list_param:
             if not (anime[key] == param):
                 anime_list_param.remove(anime)
 
@@ -35,7 +35,7 @@ def check_yes_or_not(param, key, check_param,
                 if anime[key] == check_param:
                     anime_list_param.remove(anime)
         if param == 'N':
-            for anime in anime_list_temp:
+            for anime in anime_temp_list_param:
                 if anime[key] != check_param:
                     anime_list_param.remove(anime)
 
