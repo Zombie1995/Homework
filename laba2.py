@@ -1,10 +1,12 @@
 import csv
 
-f = open('anime.csv', encoding='utf-8', newline = '')
+f = open('anime.csv', encoding='utf-8', newline='')
 animes = csv.DictReader(f)
 
+
 #########functions#########
-def check_multiple_params(mult_params, key, anime_list_param, anime_temp_list_param):
+def check_multiple_params(mult_params, key,
+                          anime_list_param, anime_temp_list_param):
     if mult_params != ['']:
         rmv = True
         for anime in anime_temp_list_param:
@@ -16,12 +18,17 @@ def check_multiple_params(mult_params, key, anime_list_param, anime_temp_list_pa
             if rmv:
                 anime_list_param.remove(anime)
             rmv = True
+
+
 def check_one_param(param, key, anime_list_param, anime_temp_list_param):
     if param != '':
         for anime in anime_list_temp:
             if not (anime[key] == param):
                 anime_list_param.remove(anime)
-def check_yes_or_not(param, key, check_param, anime_list_param, anime_temp_list_param):
+
+
+def check_yes_or_not(param, key, check_param,
+                     anime_list_param, anime_temp_list_param):
     if param != '':
         if param == 'Y':
             for anime in anime_temp_list_param:
@@ -31,36 +38,42 @@ def check_yes_or_not(param, key, check_param, anime_list_param, anime_temp_list_
             for anime in anime_list_temp:
                 if anime[key] != check_param:
                     anime_list_param.remove(anime)
+
+
 def custom_key(anime):
     try:
         result = float(anime['Rating Score'])
         return result
-    except:
+    except ValueError:
         return 0
+
 
 #########task1#########
 print('Жанры?')
 janres = input().replace(' ', '').split(',')
 if janres != ['']:
     for num in range(len(janres)):
-        janres[num] = janres[num].lower()
-        temp_list = list(janres[num])
-        temp_list[0] = temp_list[0].upper()
-        janres[num] = ''.join(temp_list)
+        janres[num] = janres[num].capitalize()
+# Обоснование:
+# for janre in janres:
+#     janre = janre.capitalize()
+# так не работает
+# for num in range(len(janres)):
+#     janres[num] = janres[num].capitalize()
+# так работает
 print('Тип? (Че это?)')
-type = input()
+anime_type = input()
 print('Многосерийное аниме? (Y, N)')
 is_serial = input()
 print('Законченное аниме? (Y, N)')
 is_finished = input()
 print('Предпочтительные студии?')
 studios = input().replace(' ', '').split(',')
-#остальное думаю не имеет смысла опрашивать, не знаю
+# остальное думаю не имеет смысла опрашивать, не знаю
 
 anime_list = list()
 anime_list_temp = list()
-for anime in animes:
-    anime_list.append(anime)
+anime_list = [anime for anime in animes]
 anime_list_temp = anime_list.copy()
 
 check_multiple_params(janres, 'Tags', anime_list, anime_list_temp)
@@ -69,7 +82,7 @@ anime_list_temp = anime_list.copy()
 check_multiple_params(studios, 'Studios', anime_list, anime_list_temp)
 anime_list_temp = anime_list.copy()
 
-check_one_param(type, 'Type', anime_list, anime_list_temp)
+check_one_param(anime_type, 'Type', anime_list, anime_list_temp)
 anime_list_temp = anime_list.copy()
 
 check_yes_or_not(is_serial, 'Episodes', '1', anime_list, anime_list_temp)
@@ -95,7 +108,8 @@ import requests
 
 i = 1
 for anime in anime_list:
-    url = 'https://www.anime-planet.com/images/anime/covers/thumbs/' + str(anime['Anime-PlanetID']) + '.jpg'
+    url = 'https://www.anime-planet.com/images/anime/covers/thumbs/' \
+          + str(anime['Anime-PlanetID']) + '.jpg'
     img_data = requests.get(url).content
     handler = open(str(i) + '.jpg', 'wb')
     handler.write(img_data)
@@ -105,6 +119,9 @@ for anime in anime_list:
         break
 
 #########workspace#########
+
+# for anime in animes:
+#     anime_list.append(anime)
 
 # import pip
 # pip.main(['install','requests'])
