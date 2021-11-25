@@ -6,10 +6,10 @@ animes = csv.DictReader(f)
 
 #########functions#########
 def check_multiple_params(mult_params, key,
-                          anime_list_param, anime_temp_list_param):
+                          anime_list_param):
     if mult_params != ['']:
         rmv = True
-        for anime in anime_temp_list_param:
+        for anime in anime_list_param[:]:
             for param in mult_params:
                 anime_params = anime[key].replace(' ', '').split(',')
                 if param in anime_params:
@@ -20,22 +20,22 @@ def check_multiple_params(mult_params, key,
             rmv = True
 
 
-def check_one_param(param, key, anime_list_param, anime_temp_list_param):
+def check_one_param(param, key, anime_list_param):
     if param != '':
-        for anime in anime_temp_list_param:
+        for anime in anime_list_param[:]:
             if not (anime[key] == param):
                 anime_list_param.remove(anime)
 
 
 def check_yes_or_not(param, key, check_param,
-                     anime_list_param, anime_temp_list_param):
+                     anime_list_param):
     if param != '':
         if param == 'Y':
-            for anime in anime_temp_list_param:
+            for anime in anime_list_param[:]:
                 if anime[key] == check_param:
                     anime_list_param.remove(anime)
         if param == 'N':
-            for anime in anime_temp_list_param:
+            for anime in anime_list_param[:]:
                 if anime[key] != check_param:
                     anime_list_param.remove(anime)
 
@@ -74,22 +74,16 @@ studios = input().replace(' ', '').split(',')
 anime_list = list()
 anime_list_temp = list()
 anime_list = [anime for anime in animes]
-anime_list_temp = anime_list.copy()
 
-check_multiple_params(janres, 'Tags', anime_list, anime_list_temp)
-anime_list_temp = anime_list.copy()
+check_multiple_params(janres, 'Tags', anime_list)
 
-check_multiple_params(studios, 'Studios', anime_list, anime_list_temp)
-anime_list_temp = anime_list.copy()
+check_multiple_params(studios, 'Studios', anime_list)
 
-check_one_param(anime_type, 'Type', anime_list, anime_list_temp)
-anime_list_temp = anime_list.copy()
+check_one_param(anime_type, 'Type', anime_list)
 
-check_yes_or_not(is_serial, 'Episodes', '1', anime_list, anime_list_temp)
-anime_list_temp = anime_list.copy()
+check_yes_or_not(is_serial, 'Episodes', '1', anime_list)
 
-check_yes_or_not(is_finished, 'Finished', 'False', anime_list, anime_list_temp)
-anime_list_temp = anime_list.copy()
+check_yes_or_not(is_finished, 'Finished', 'False', anime_list)
 
 f.close()
 
