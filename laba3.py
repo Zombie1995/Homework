@@ -142,7 +142,7 @@ class BdfFont():
                     if self.bitmap_y >= 0 and self.bitmap_y < self.height:
                         self.shiftedBitmap[self.m][self.n] = self.bitmap[self.bitmap_y][self.bitmap_x]
 
-    def getLetterArray(self, letter):
+    def getLetterArray(self, letter, dataFile):
         self.getFontBitmap(dataFile, str(ord(letter)).strip())
         self.shiftBitmap()
 
@@ -158,10 +158,10 @@ class BdfFont():
             self.tempLetter.append(self.tempRow)
         return self.tempLetter
 
-    def getWordArray(self, word, height=18):
+    def getWordArray(self, word, dataFile, height=18):
         self.tempWord = height * [[]]
         for self.letter in word:
-            self.letterArray = self.getLetterArray(self.letter)
+            self.letterArray = self.getLetterArray(self.letter, dataFile)
             for self.i in range(height):
                 self.tempWord[self.i] = self.tempWord[self.i] + self.letterArray[self.i]
         return self.tempWord
@@ -281,7 +281,7 @@ bdfFontData = BdfFont()
 bdfFontData.setFontFormatParameters(dataFile)
 
 word = input()
-wordArray = bdfFontData.getWordArray(word)
+wordArray = bdfFontData.getWordArray(word, dataFile)
 
 writeTIFF(wordArray)
 
