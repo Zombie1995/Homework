@@ -28,7 +28,8 @@ class BdfFont():
         except ValueError:
             print("Invalid input number")
             exit()
-        self.strEncodingNumber = self._strEncoding + " " + str(self.intEncodingNumber)
+        self.strEncodingNumber = \
+            self._strEncoding + " " + str(self.intEncodingNumber)
 
     def setFontFormatParameters(self, dataFile):
         for self.extractLine in dataFile:
@@ -137,10 +138,13 @@ class BdfFont():
         for self.m in range(self.windowHeight):
             for self.n in range(self.windowWidth):
                 self.bitmap_x = self.n - self.xoffset + self.windowXoffset
-                self.bitmap_y = self.m + self.yoffset - self.windowYoffset + (self.height - self.windowHeight)
+                self.bitmap_y = \
+                    self.m + self.yoffset\
+                    - self.windowYoffset + (self.height - self.windowHeight)
                 if self.bitmap_x >= 0 and self.bitmap_x < self.width:
                     if self.bitmap_y >= 0 and self.bitmap_y < self.height:
-                        self.shiftedBitmap[self.m][self.n] = self.bitmap[self.bitmap_y][self.bitmap_x]
+                        self.shiftedBitmap[self.m][self.n] = \
+                            self.bitmap[self.bitmap_y][self.bitmap_x]
 
     def getLetterArray(self, letter, dataFile):
         self.getFontBitmap(dataFile, str(ord(letter)).strip())
@@ -163,7 +167,8 @@ class BdfFont():
         for self.letter in word:
             self.letterArray = self.getLetterArray(self.letter, dataFile)
             for self.i in range(height):
-                self.tempWord[self.i] = self.tempWord[self.i] + self.letterArray[self.i]
+                self.tempWord[self.i] = \
+                    self.tempWord[self.i] + self.letterArray[self.i]
         return self.tempWord
 
 
