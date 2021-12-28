@@ -18,20 +18,21 @@ class BdfFont():
         self.yoffset = 0
         self.flagEncodeExist = False
 
-    def setEncodingNumber(self, number):
+    def set_encoding_number(self, number):
+        intEncodingNumber = 0
         try:
             if number.startswith("0x"):
-                self.intEncodingNumber = int(number, 16)
+                intEncodingNumber = int(number, 16)
             else:
-                self.intEncodingNumber = int(number)
+                intEncodingNumber = int(number)
 
         except ValueError:
             print("Invalid input number")
             exit()
         self.strEncodingNumber = \
-            self._strEncoding + " " + str(self.intEncodingNumber)
+            self._strEncoding + " " + str(intEncodingNumber)
 
-    def setFontFormatParameters(self, dataFile):
+    def set_font_format_parameters(self, dataFile):
         for self.extractLine in dataFile:
             self.extractLine = self.extractLine.strip()
             if self.extractLine.startswith(self._strFontBoundingBox):
@@ -43,26 +44,26 @@ class BdfFont():
         self.windowXoffset = int(self.listFontBoundingBox[3])
         self.windowYoffset = int(self.listFontBoundingBox[4])
 
-    def setFontParameters(self, bbx):
+    def set_font_farameters(self, bbx):
         self.tempList = bbx.split()
         self.width = int(self.tempList[1])
         self.height = int(self.tempList[2])
         self.xoffset = int(self.tempList[3])
         self.yoffset = int(self.tempList[4])
 
-    def bitmapArrayZeroClear(self):
+    def bitmap_array_zero_clear(self):
         self.bitmapArray = []
-        for self.m in range(self.windowHeight):
+        for m in range(self.windowHeight):
             self.tempList = []
-            for self.n in range(self.windowWidth):
+            for n in range(self.windowWidth):
                 self.tempList.append(0)
             self.bitmapArray.append(self.tempList)
         return self.bitmapArray
 
-    def bitmapList2Array(self, bitmapList):
+    def bitmap_list2array(self, bitmapList):
         self.bitmap = []
-        for self.m in range(len(bitmapList)):
-            self.bitData = int(bitmapList[self.m], 16)
+        for m in range(len(bitmapList)):
+            self.bitData = int(bitmapList[m], 16)
             self.temp = self.bitData
             self.tempList = []
             if self.width > 9:
@@ -70,7 +71,7 @@ class BdfFont():
             else:
                 self.shiftBits = 8 - 1
 
-            for self.n in range(self.width):
+            for n in range(self.width):
                 self.bit = (1 << (self.shiftBits)) & self.temp
                 self.temp = self.temp << 1
                 if self.bit == (1 << (self.shiftBits)):
@@ -79,36 +80,36 @@ class BdfFont():
                     self.tempList.append(0)
             self.bitmap.append(self.tempList)
 
-    def printBitmap(self, charBitOne="*", charBitZero="-"):
+    def print_bitmap(self, charBitOne="*", charBitZero="-"):
         if not self.flagEncodeExist:
             print("No Encode Number")
             return
 
-        for self.m in range(self.height):
+        for m in range(self.height):
             self.temp = ""
-            for self.n in range(self.width):
-                if self.bitmap[self.m][self.n] == 1:
+            for n in range(self.width):
+                if self.bitmap[m][n] == 1:
                     self.temp = self.temp + charBitOne
                 else:
                     self.temp = self.temp + charBitZero
             print(self.temp)
 
-    def printShiftedBitmap(self, charBitOne="*", charBitZero="-"):
+    def print_shifted_bitmap(self, charBitOne="*", charBitZero="-"):
         if not self.flagEncodeExist:
             print("No Encode Number")
             return
 
-        for self.m in range(self.windowHeight):
+        for m in range(self.windowHeight):
             self.temp = ""
-            for self.n in range(self.windowWidth):
-                if self.shiftedBitmap[self.m][self.n] == 1:
+            for n in range(self.windowWidth):
+                if self.shiftedBitmap[m][n] == 1:
                     self.temp = self.temp + charBitOne
                 else:
                     self.temp = self.temp + charBitZero
             print(self.temp)
 
-    def getFontBitmap(self, dataFile, encoding):
-        self.setEncodingNumber(encoding)
+    def get_font_bitmap(self, dataFile, encoding):
+        self.set_encoding_number(encoding)
         self.extractedList = []
         self.flagFound = False
         self.flagNeverFound = True
@@ -122,75 +123,79 @@ class BdfFont():
             if self.flagFound:
                 self.extractedList.append(self.extractLine)
         if not self.flagNeverFound:
-            self.setFontParameters(self.extractedList[3])
-            self.bitmapList2Array(self.extractedList[5:])
+            self.set_font_farameters(self.extractedList[3])
+            self.bitmap_list2array(self.extractedList[5:])
             self.flagEncodeExist = True
         else:
-            self.bitmap = self.bitmapArrayZeroClear()
+            self.bitmap = self.bitmap_array_zero_clear()
             self.flagEncodeExist = False
             # print(self.extractedList)
 
-    def shiftBitmap(self):
-        self.shiftedBitmap = self.bitmapArrayZeroClear()
+    def shift_bitmap(self):
+        self.shiftedBitmap = self.bitmap_array_zero_clear()
         if not self.flagEncodeExist:
             return
 
-        for self.m in range(self.windowHeight):
-            for self.n in range(self.windowWidth):
-                self.bitmap_x = self.n - self.xoffset + self.windowXoffset
+        for m in range(self.windowHeight):
+            for n in range(self.windowWidth):
+                self.bitmap_x = n - self.xoffset + self.windowXoffset
                 self.bitmap_y = \
-                    self.m + self.yoffset\
+                    m + self.yoffset \
                     - self.windowYoffset + (self.height - self.windowHeight)
                 if self.bitmap_x >= 0 and self.bitmap_x < self.width:
                     if self.bitmap_y >= 0 and self.bitmap_y < self.height:
-                        self.shiftedBitmap[self.m][self.n] = \
+                        self.shiftedBitmap[m][n] = \
                             self.bitmap[self.bitmap_y][self.bitmap_x]
 
-    def getLetterArray(self, letter, dataFile):
-        self.getFontBitmap(dataFile, str(ord(letter)).strip())
-        self.shiftBitmap()
+    def get_letter_array(self, letter, dataFile):
+        self.get_font_bitmap(dataFile, str(ord(letter)).strip())
+        self.shift_bitmap()
 
         if not self.flagEncodeExist:
             print("No Encode Number")
             return
 
         self.tempLetter = []
-        for self.m in range(self.windowHeight):
+        for m in range(self.windowHeight):
             self.tempRow = []
-            for self.n in range(self.windowWidth):
-                self.tempRow.append(self.shiftedBitmap[self.m][self.n])
+            for n in range(self.windowWidth):
+                self.tempRow.append(self.shiftedBitmap[m][n])
             self.tempLetter.append(self.tempRow)
         return self.tempLetter
 
-    def getWordArray(self, word, dataFile, height=18):
-        self.tempWord = height * [[]]
-        for self.letter in word:
-            self.letterArray = self.getLetterArray(self.letter, dataFile)
-            for self.i in range(height):
-                self.tempWord[self.i] = \
-                    self.tempWord[self.i] + self.letterArray[self.i]
-        return self.tempWord
+    def get_word_array(self, word, dataFile, height=18):
+        tempWord = height * [[]]
+        for letter in word:
+            letterArray = self.get_letter_array(letter, dataFile)
+            for i in range(height):
+                tempWord[i] = \
+                    tempWord[i] + letterArray[i]
+        return tempWord
 
 
-def WriteHexString(f_param, hex_param):
+def write_hex_string(f_param, hex_param):
     while hex_param != '':
         num = int(hex_param[0:2], 16)
         f_param.write(struct.pack('>B', num))
         hex_param = hex_param[2:]
 
 
-def writeTIFF(wordArray):
+def write_with_offset(f_param, offset_param):
+    f_param.write(struct.pack('>B', ((offset_param & 0xff000000) // 16777216)))
+    f_param.write(struct.pack('>B', ((offset_param & 0x00ff0000) // 65536)))
+    f_param.write(struct.pack('>B', ((offset_param & 0x0000ff00) // 256)))
+    f_param.write(struct.pack('>B', ((offset_param & 0x000000ff))))
+
+
+def write_TIFF(wordArray):
     f = open('temp.tiff', 'wb')
 
     offset = 0
     nx = len(wordArray[0])
     ny = len(wordArray)
-    WriteHexString(f, "4d4d002a")
+    write_hex_string(f, "4d4d002a")
     offset = nx * ny * 3 + 8
-    f.write(struct.pack('>B', ((offset & 0xff000000) // 16777216)))
-    f.write(struct.pack('>B', ((offset & 0x00ff0000) // 65536)))
-    f.write(struct.pack('>B', ((offset & 0x0000ff00) // 256)))
-    f.write(struct.pack('>B', ((offset & 0x000000ff))))
+    write_with_offset(f, offset)
 
     for j in range(ny):
         for i in range(nx):
@@ -203,79 +208,64 @@ def writeTIFF(wordArray):
                 f.write(struct.pack('>B', (0)))
                 f.write(struct.pack('>B', (0)))
 
-    WriteHexString(f, "000e")
+    write_hex_string(f, "000e")
 
-    WriteHexString(f, "0100000300000001")
+    write_hex_string(f, "0100000300000001")
     f.write(struct.pack('>B', ((nx & 0xff00) // 256)))
     f.write(struct.pack('>B', ((nx & 0x00ff))))
-    WriteHexString(f, "0000")
+    write_hex_string(f, "0000")
 
-    WriteHexString(f, "0101000300000001")
+    write_hex_string(f, "0101000300000001")
     f.write(struct.pack('>B', ((ny & 0xff00) // 256)))
     f.write(struct.pack('>B', ((ny & 0x00ff))))
-    WriteHexString(f, "0000")
+    write_hex_string(f, "0000")
 
-    WriteHexString(f, "0102000300000003")
+    write_hex_string(f, "0102000300000003")
     offset = nx * ny * 3 + 182
-    f.write(struct.pack('>B', ((offset & 0xff000000) // 16777216)))
-    f.write(struct.pack('>B', ((offset & 0x00ff0000) // 65536)))
-    f.write(struct.pack('>B', ((offset & 0x0000ff00) // 256)))
-    f.write(struct.pack('>B', ((offset & 0x000000ff))))
+    write_with_offset(f, offset)
 
-    WriteHexString(f, "010300030000000100010000")
+    write_hex_string(f, "010300030000000100010000")
 
-    WriteHexString(f, "010600030000000100020000")
+    write_hex_string(f, "010600030000000100020000")
 
-    WriteHexString(f, "011100040000000100000008")
+    write_hex_string(f, "011100040000000100000008")
 
-    WriteHexString(f, "011200030000000100010000")
+    write_hex_string(f, "011200030000000100010000")
 
-    WriteHexString(f, "011500030000000100030000")
+    write_hex_string(f, "011500030000000100030000")
 
-    WriteHexString(f, "0116000300000001")
+    write_hex_string(f, "0116000300000001")
     f.write(struct.pack('>B', ((ny & 0xff00) // 256)))
     f.write(struct.pack('>B', ((ny & 0x00ff))))
-    WriteHexString(f, "0000")
+    write_hex_string(f, "0000")
 
-    WriteHexString(f, "0117000400000001")
+    write_hex_string(f, "0117000400000001")
     offset = nx * ny * 3
-    f.write(struct.pack('>B', ((offset & 0xff000000) // 16777216)))
-    f.write(struct.pack('>B', ((offset & 0x00ff0000) // 65536)))
-    f.write(struct.pack('>B', ((offset & 0x0000ff00) // 256)))
-    f.write(struct.pack('>B', ((offset & 0x000000ff))))
+    write_with_offset(f, offset)
 
-    WriteHexString(f, "0118000300000003")
+    write_hex_string(f, "0118000300000003")
     offset = nx * ny * 3 + 188
-    f.write(struct.pack('>B', ((offset & 0xff000000) // 16777216)))
-    f.write(struct.pack('>B', ((offset & 0x00ff0000) // 65536)))
-    f.write(struct.pack('>B', ((offset & 0x0000ff00) // 256)))
-    f.write(struct.pack('>B', ((offset & 0x000000ff))))
+    write_with_offset(f, offset)
 
-    WriteHexString(f, "0119000300000003")
+    write_hex_string(f, "0119000300000003")
     offset = nx * ny * 3 + 194
-    f.write(struct.pack('>B', ((offset & 0xff000000) // 16777216)))
-    f.write(struct.pack('>B', ((offset & 0x00ff0000) // 65536)))
-    f.write(struct.pack('>B', ((offset & 0x0000ff00) // 256)))
-    f.write(struct.pack('>B', ((offset & 0x000000ff))))
+    write_with_offset(f, offset)
 
-    WriteHexString(f, "011c00030000000100010000")
+    write_hex_string(f, "011c00030000000100010000")
 
-    WriteHexString(f, "0153000300000003")
+    write_hex_string(f, "0153000300000003")
     offset = nx * ny * 3 + 200
-    f.write(struct.pack('>B', ((offset & 0xff000000) // 16777216)))
-    f.write(struct.pack('>B', ((offset & 0x00ff0000) // 65536)))
-    f.write(struct.pack('>B', ((offset & 0x0000ff00) // 256)))
-    f.write(struct.pack('>B', ((offset & 0x000000ff))))
+    write_with_offset(f, offset)
 
-    WriteHexString(f, "00000000")
+    write_hex_string(f, "00000000")
 
-    WriteHexString(f, "000800080008")
+    write_hex_string(f, "000800080008")
 
-    WriteHexString(f, "000000000000")
+    write_hex_string(f, "000000000000")
 
-    WriteHexString(f, "00ff00ff00ff")
+    write_hex_string(f, "00ff00ff00ff")
 
-    WriteHexString(f, "000100010001")
+    write_hex_string(f, "000100010001")
 
     f.close()
 
@@ -283,18 +273,18 @@ def writeTIFF(wordArray):
 #### main body ###
 dataFile = open('I-pixel-u.bdf').readlines()
 bdfFontData = BdfFont()
-bdfFontData.setFontFormatParameters(dataFile)
+bdfFontData.set_font_format_parameters(dataFile)
 
 word = input()
-wordArray = bdfFontData.getWordArray(word, dataFile)
+wordArray = bdfFontData.get_word_array(word, dataFile)
 
-writeTIFF(wordArray)
+write_TIFF(wordArray)
 
 ########## Workspace ###########
 # word = input()
 # for letter in word:
-#     bdfFontData.getFontBitmap(dataFile, str(ord(letter)).strip())
-#     bdfFontData.printBitmap(" ", "#")
-#     bdfFontData.shiftBitmap()
-#     bdfFontData.printShiftedBitmap("#", " ")
-#     print(bdfFontData.getLetterArray())
+#     bdfFontData.get_font_bitmap(dataFile, str(ord(letter)).strip())
+#     bdfFontData.print_bitmap(" ", "#")
+#     bdfFontData.shift_bitmap()
+#     bdfFontData.print_shifted_bitmap("#", " ")
+#     print(bdfFontData.get_letter_array())
